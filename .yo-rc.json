@@ -1,0 +1,32 @@
+{
+  "@pnp/generator-spfx": {
+    "framework": "react",
+    "pnpFramework": "reactjs.plus",
+    "pnp-libraries": [
+      "jquery@3",
+      "msgraph",
+      "@pnp/pnpjs",
+      "@pnp/spfx-property-controls",
+      "spfx-uifabric-themes",
+      "lodash",
+      "@pnp/spfx-controls-react",
+      "ouifr@6fluent",
+      "rush@3.7"
+    ],
+    "pnp-ci": "no-devops",
+    "pnp-vetting": [],
+    "spfxenv": "spo",
+    "pnp-testing": []
+  },
+  "@microsoft/generator-sharepoint": {
+    "environment": "spo",
+    "framework": "react",
+    "isCreatingSolution": true,
+    "version": "1.11.0",
+    "libraryName": "react-discussion-board",
+    "libraryId": "5f4a3e20-b2cd-4bf9-a699-3ecc97e57325",
+    "packageManager": "npm",
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}
