@@ -1,4 +1,4 @@
-import { Web } from "@pnp/sp/webs";
+import { sp } from "@pnp/sp";
 import "@pnp/sp/fields";
 import "@pnp/sp/items";
 import "@pnp/sp/lists";
@@ -16,14 +16,12 @@ export const useList = () => {
   (async () => {})();
 
   const addReply = async (
-    siteurl: string,
     listname: string,
     fileref: string,
     itemid: number,
     msg: string
   ): Promise<boolean> => {
-    const w = Web(siteurl);
-    await w.lists
+    await sp.web.lists
       .getByTitle(listname)
       .items.add({
         Body: msg, //message Body
@@ -35,7 +33,7 @@ export const useList = () => {
       })
       .then(async (retorno: IItemAddResult) => {
         //move o item
-        await w.lists
+        await sp.web.lists
           .getByTitle(listname)
           .items.select("*,FileRef,FileDirRef") // FileRef is a discussion folder path
           .filter(`startswith(ContentTypeId, '0x0107')`)
@@ -46,7 +44,7 @@ export const useList = () => {
             var fileUrl = _dt[0].FileRef;
             var fileDirRef = _dt[0].FileDirRef;
             var moveFileUrl = fileUrl.replace(fileDirRef, fileref);
-            w.getFileByServerRelativePath(fileUrl)
+            sp.web.getFileByServerRelativePath(fileUrl)
               .moveTo(moveFileUrl, MoveOperations.Overwrite)
               .then(() => {
                 return true;
@@ -61,13 +59,11 @@ export const useList = () => {
   };
 
   const addItem = async (
-    siteurl: string,
     listname: string,
     titulo: string,
     msg: string
   ): Promise<boolean> => {
-    const w = Web(siteurl);
-    let retorno = await w.lists
+    let retorno = await sp.web.lists
       .getByTitle(listname)
       .items.add({
         Title: titulo,
@@ -85,13 +81,11 @@ export const useList = () => {
   };
 
   const allItens = async (
-    siteurl: string,
     listname: string,
     tipo: string,
     t: number,
     currentuser: number
   ): Promise<any> => {
-    const w = Web(siteurl);
     let filter;
     if (tipo == "Recentes") {
       filter = `startswith(ContentTypeId, '0x0120')`;
@@ -101,7 +95,7 @@ export const useList = () => {
     } else if (tipo == "Por Responder") {
       filter = `startswith(ContentTypeId, '0x0120') and IsFeatured eq 0`;
     }
-    let retorno = await w.lists
+    let retorno = await sp.web.lists
       .getByTitle(listname)
       .items.select("*,FileRef") // FileRef is a discussion folder path
       .filter(filter)
@@ -112,22 +106,20 @@ export const useList = () => {
   };
 
   const getItemByID = async (
-    siteurl: string,
     listname: string,
     iditem: number
   ): Promise<any> => {
     let datasource: any;
-    const w = Web(siteurl);
-    await w.lists
+    await sp.web.lists
       .getByTitle(listname)
       .items.select("*,FileRef") // FileRef is a discussion folder path
       .filter(`startswith(ContentTypeId, '0x0120')`)
       .orderBy("DiscussionLastUpdated", true)
       .getAll()
       .then(async (itens) => {
-        let datasourceItens = _.filter(itens, { Id: this.iditem });
-        let dataSourceByDefinition: any = await w.lists
-          .getByTitle(this.listname)
+        let datasourceItens = itens; //_.filter(itens, { Id: iditem});
+        let dataSourceByDefinition: any = await sp.web.lists
+          .getByTitle(listname)
           .items.filter(`FileDirRef eq '${datasourceItens[0].FileRef}'`)
           .get();
         datasourceItens[0].push({
